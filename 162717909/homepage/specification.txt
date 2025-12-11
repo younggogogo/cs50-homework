@@ -1,0 +1,4 @@
+HTML TAGS: table em footer header p ul ol a img br
+CSS properties:font-size background-color text-decoration font-weight padding
+
+i chose a alert js and bootsrap's fold and botton style

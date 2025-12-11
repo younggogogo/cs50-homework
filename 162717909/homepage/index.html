@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+        <link href="styles.css" rel="stylesheet">
+        <title>My Webpage</title>
+    </head>
+    <body>
+        <header>
+            <h1 class="highlight">
+                Welcome to my homepage
+            </h1>
+            <p><a href="hobby.html" class="btn btn-primary"  role="button" >HOBBY</a>This is my hobby</p>
+            <p><a href="favoritecourse.html" class="btn btn-primary "  role="button" >Favoritecourse</a>This is my favorite cs50 course</p>
+            <p><a href="extracurricular.html" class="btn btn-primary"  role="button" >exrtacurricular</a>This is my faborite extracurricular</p>
+        </header>
+
+        <p>From the above you can know more about me</p>
+        <button class="btn btn-primary" id = "alarm">hello</button>
+
+        <script>
+            document.getElementById('alarm').onclick=function(){
+                alert('hello');
+            }
+        </script>
+
+        <footer style="background-color: rgb(255, 99, 71); padding: 15px; color: white;" id = "young">
+             <em>made by young 20251023</em>
+        </footer>
+
+    </body>
+</html>

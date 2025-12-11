@@ -1,0 +1,27 @@
+p{
+    font-size:16px;
+    font-weight:700;
+}
+#young{
+    backbround-color:#fff3cd;
+    padding:8px 12px;
+    border-left:3px solid #ffc107
+}
+
+.highlight{
+    background-color:#fff5cd
+}
+
+
+tbody td{
+    color:#0d6688;
+    font-weight:200;
+}
+
+tbody td:hover{
+    text-decoration:underline;
+}
+
+ul li:nth-child(odd){
+    background-color:#f1f1f1;
+}

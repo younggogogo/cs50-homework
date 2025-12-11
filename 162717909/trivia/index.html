@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+        <link href="styles.css" rel="stylesheet">
+        <title>Trivia!</title>
+        <script>
+            // TODO: Add code to check answers to questions
+            function checkmutiplechoice(event){
+                let button = event.target;
+                if (button.innerHTML == "6 people per 1 sheep"){
+                    button.style.backgroundColor = 'green';
+                    button.parentElement.querySelector('.tip1').innerHTML = '对';
+                }else{
+                    button.style.backgroundColor = 'red';
+                    button.parentElement.querySelector('.tip1').innerHTML = '不对';
+                }
+            }
+
+            function checkfreeresponse(event){
+                let button = event.target;
+                let word = button.parentElement.querySelector('input');
+                if (word.value === "新西兰"){
+                    word.style.backgroundColor = 'green';
+                    word.parentElement.querySelector('.tip2').innerHTML = '正确！';
+                }else{
+                    word.style.backgroundColor = 'red';
+                    word.parentElement.querySelector('.tip2').innerHTML = '不正确！';
+                }
+            }
+
+        </script>
+    </head>
+    <body>
+        <div class="header">
+            <h1>Trivia!</h1>
+        </div>
+
+        <div class="container">
+            <div class="section">
+                <h2>Part 1: Multiple Choice </h2>
+                <hr>
+                <!-- TODO: Add multiple choice question here -->
+                 <h2>What is the approximate ratio of people to dog of New Zealand </h2>
+                 <button onclick = "checkmutiplechoice(event)">6 people per 1 sheep</button>
+                 <button onclick = "checkmutiplechoice(event)">5 people per 1 sheep</button>
+                 <button onclick = "checkmutiplechoice(event)">4 people per 1 sheep</button>
+                 <button onclick = "checkmutiplechoice(event)">3 people per 1 sheep</button>
+                 <p class="tip1"></p>
+            </div>
+
+            <div class="section">
+                <h2>Part 2: Free Response</h2>
+                <hr>
+                <!-- TODO: Add free response question here -->
+                <h3>In which country is it illegal to own only one guinea pig as a lone guinea pig might get lonely?</h3>
+                <input> </input>
+                <button onclick = "checkfreeresponse(event)">check answer</button>
+                <p class='tip2'></p>
+            </div>
+        </div>
+    </body>
+</html>
