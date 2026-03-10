@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    PORTFOLIO
+{% endblock %}
+
+{% block main %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th class="text-start">SYMBOL</th>
+                <th class="text-end">SHARES</th>
+                <th class="text-end">PRICE</th>
+                <th class="text-end">TOTAL</th>
+                <th class="text-end">PROFIT</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stock in holding %}
+            <tr>
+                <td class="text-start">{{ stock.symbol }}</td>
+                <td class="text-end">{{ stock.shares }}</td>
+                <td class="text-end">{{stock.current_price|usd}}</td>
+                <td class="text-end">{{(stock.current_price*stock.shares)|usd}}</td>
+                <td class="text-end fw-bold {% if stock.profit > 0 %}text-danger{% else %}text-success{% endif %}">{{stock.profit|usd}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td class="border-0 fw-bold text-end" colspan="3">CASH</td>
+                <td class="border-0 text-end">{{ cash | usd}}</td>
+            </tr>
+            <tr>
+                <td class="border-0 fw-bold text-end" colspan="3">TOTAL</td>
+                <td class="border-0 text-end">{{ (total_holdingprice+cash)|usd }}</td>
+            </tr>
+            <tr>
+                <td class="border-0 fw-bold text-end" colspan="3">TOTAL-PROFIT</td>
+                <td class="border-0 text-end  fw-bold {% if total_profit > 0 %}text-danger{% else %}text-success{% endif %}" colspan="3">{{ total_profit|usd }}</td>
+            </tr>
+        </tfoot>
+    </table>
+{% endblock %}

@@ -50,10 +50,7 @@
         "C_Cpp.enhancedColorization": "enabled",
         "C_Cpp.errorSquiggles": "disabled",
         "C_Cpp.formatting": "clangFormat",
-        "chat.agent.enabled": false,
-        "chat.agent.maxRequests": 0,
-        "chat.commandCenter.enabled": false,
-        "chat.notifyWindowOnConfirmation": false,
+        "chat.disableAIFeatures": true,
         "cs50.watchPorts": [
           5000,
           8080,
@@ -128,20 +125,6 @@
         "gitdoc.enabled": true,
         "gitdoc.pullOnOpen": false,
         "github.codespaces.devcontainerChangedNotificationStyle": "none",
-        "github.copilot.chat.agent.currentEditorContext.enabled": false,
-        "github.copilot.chat.copilotDebugCommand.enabled": false,
-        "github.copilot.chat.edits.newNotebook.enabled": false,
-        "github.copilot.chat.edits.suggestRelatedFilesForTests": false,
-        "github.copilot.chat.edits.suggestRelatedFilesFromGitHistory": false,
-        "github.copilot.chat.newWorkspaceCreation.enabled": false,
-        "github.copilot.chat.reviewSelection.enabled": false,
-        "github.copilot.chat.setupTests.enabled": false,
-        "github.copilot.chat.startDebugging.enabled": false,
-        "github.copilot.chat.summarizeAgentConversationHistory.enabled": false,
-        "github.copilot.editor.enableCodeActions": false,
-        "github.copilot.enable": {
-          "*": false
-        },
         "github.gitAuthentication": true,
         "html.autoCreateQuotes": false,
         "html.format.indentInnerHtml": true,
@@ -163,11 +146,31 @@
         "problems.decorations.enabled": false,
         "problems.visibility": false,
         "python.terminal.executeInFileDir": true,
+        "python.terminal.shellIntegration.enabled": false,
         "remote.autoForwardPorts": true,
-        "remote.autoForwardPortsFallback": 0,
         "remote.autoForwardPortsSource": "process",
         "remote.otherPortsAttributes": {
-          "onAutoForward": "silent"
+          "onAutoForward": "ignore"
+        },
+        "remote.portsAttributes": {
+          "5000": {
+            "onAutoForward": "silent"
+          },
+          "5900": {
+            "onAutoForward": "silent"
+          },
+          "6081": {
+            "onAutoForward": "silent"
+          },
+          "8080": {
+            "onAutoForward": "silent"
+          },
+          "8082": {
+            "onAutoForward": "silent"
+          },
+          "8787": {
+            "onAutoForward": "silent"
+          }
         },
         "scm.countBadge": "off",
         "terminal.integrated.commandsToSkipShell": [
@@ -243,7 +246,7 @@
     8082,
     8787
   ],
-  "image": "ghcr.io/cs50/codespace:7147495a77793f76d49158f9793b266110d198a2",
+  "image": "ghcr.io/cs50/codespace:2d3b8076f88def07c2c882f7e8ca3969ee8be6ad",
   "mounts": [
     {
       "source": "/var/run/docker.sock",

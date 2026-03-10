@@ -35,7 +35,29 @@ def after_request(response):
 @login_required
 def index():
     """Show portfolio of stocks"""
-    return apology("TODO")
+    id = session["user_id"]
+    holdings = db.execute(" SELECT * FROM user_holdings WHERE userid = ?", id)
+    newholdings = []
+    total_holdingprice = 0
+    total_profit = 0
+
+    if holdings:
+        for holding in holdings:
+            symbol = holding["symbol"]
+            shares = holding["total_shares"]
+            rows = lookup(symbol)
+            current_price = int(rows["price"])
+            avg_price = int(holding["avg_price"])
+            profit = (current_price-avg_price)*shares
+            newholdingdic = {"symbol": symbol,
+                             "shares": shares,
+                             "current_price": current_price,
+                             "profit": profit}
+            newholdings.append(newholdingdic)
+            total_profit = total_profit+profit
+            total_holdingprice = total_holdingprice+(current_price*shares)
+    cash = db.execute(" SELECT * FROM users WHERE id = ? ", id)[0]["cash"]
+    return render_template("index.html", holding=newholdings, cash=cash, total_profit=total_profit, total_holdingprice=total_holdingprice)
 
 
 @app.route("/buy", methods=["GET", "POST"])
@@ -51,23 +73,28 @@ def buy():
             return apology("SHARES IS EMPTY", 400)
         information = lookup(symbol)
 
+        if "." in shares:
+            return apology("INVALID SHARES", 400)
+
         if not information:
             return apology("INVALID SYMBOL", 400)
         try:
-            shares=int(shares)
+            shares = int(shares)
         except ValueError:
-            return apology("INVALID SHARES",400)
+            return apology("INVALID SHARES", 400)
+
+        if shares <= 0:
+            return apology("INVALID SHARES", 400)
 
         id = session["user_id"]
         rows = db.execute(
-            "SELECT * FROM users where id=?",id
+            "SELECT * FROM users where id=?", id
         )[0]
 
-        cash=rows["cash"]
+        cash = rows["cash"]
 
-
-        current_price=information["price"]
-        symbol=information["symbol"]
+        current_price = information["price"]
+        symbol = information["symbol"]
 
         money = current_price * shares
         if money > cash:
@@ -75,33 +102,33 @@ def buy():
         else:
             cash = cash - money
             db.execute(
-                "UPDATE users SET cash=? WHERE id=?",cash,id
+                "UPDATE users SET cash=? WHERE id=?", cash, id
             )
             db.execute(
                 "INSERT INTO history(userid,symbol,trade_price,trade_shares) VALUES(?,?,?,?)",
-                id,symbol,current_price,shares
+                id, symbol, current_price, shares
             )
             hold = db.execute(
-                "SELECT * FROM user_holdings WHERE userid=? AND symbol =?",id,symbol
+                "SELECT * FROM user_holdings WHERE userid=? AND symbol =?", id, symbol
             )
             if hold:
                 hold = hold[0]
-                old_total=hold["total_shares"]
-                old_price=hold["total_price"]
-                new_total=old_total + shares
-                new_price=old_price + money
-                new_avg_price=new_price / new_total
+                old_total = hold["total_shares"]
+                old_price = hold["total_shares"]*hold["avg_price"]
+                new_total = old_total + shares
+                new_price = old_price + money
+                new_avg_price = new_price / new_total
 
                 db.execute(
-                    "UPDATE user_holdings SET total_shares=?,avg_price=?,total_price=? WHERE userid = ? AND symbol = ?"
-                        ,new_total,new_avg_price,new_price,id,symbol
+                    "UPDATE user_holdings SET total_shares=?,avg_price=? WHERE userid = ? AND symbol = ?",
+                    new_total, new_avg_price, id, symbol
                 )
             else:
                 db.execute(
-                    "INSERT INTO user_holdings(userid,symbol,total_shares,avg_price,total_price) VALUES(?,?,?,?,?) ",
-                    id,symbol,shares,current_price,money
+                    "INSERT INTO user_holdings(userid,symbol,total_shares,avg_price) VALUES(?,?,?,?) ",
+                    id, symbol, shares, current_price
                 )
-
+            flash("BOUGHT!")
             return redirect("/")
     else:
         return render_template("buy.html")
@@ -111,7 +138,10 @@ def buy():
 @login_required
 def history():
     """Show history of transactions"""
-    return apology("TODO")
+    id = session["user_id"]
+    rows = db.execute("SELECT * FROM history WHERE userid=?", id)
+
+    return render_template("history.html", rows=rows)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -146,6 +176,7 @@ def login():
         session["user_id"] = rows[0]["id"]
 
         # Redirect user to home page
+        flash("login")
         return redirect("/")
 
     # User reached route via GET (as by clicking a link or via redirect)
@@ -167,28 +198,30 @@ def logout():
 @app.route("/quote", methods=["GET", "POST"])
 @login_required
 def quote():
-    if request.method =="POST":
-        quote = request.form.get("quote")
+    if request.method == "POST":
+        quote = request.form.get("symbol")
         if not quote:
             return apology("SYMBOL IS EMPTY", 400)
         outcome = lookup(quote)
-        if  not outcome:
+        if not outcome:
             return apology("STMBOL IS INVALID", 400)
         else:
-            outcome = "A Share of " + outcome["name"] + "(" + outcome["symbol"] +  ")" + " cost $" + str(outcome["price"])
-            return render_template("quoted.html",outcome=outcome)
+            outcome = "A Share of " + outcome["name"] + \
+                "(" + outcome["symbol"] + ")" + usd(outcome["price"])
+            return render_template("quoted.html", outcome=outcome)
     else:
         return render_template("quote.html")
 
 
 @app.route("/register", methods=["GET", "POST"])
+@login_required
 def register():
     """Register user"""
     if request.method == "POST":
         password = request.form.get("password")
         confirmation = request.form.get("confirmation")
         username = request.form.get("username")
-        if  not username:
+        if not username:
             return apology("USER NAME IS EMPTY", 400)
         if not password:
             return apology("PASSWORD IS EMPTY", 400)
@@ -196,13 +229,14 @@ def register():
             return apology("PASSWORD DONT MATCH", 400)
         try:
             id = db.execute(
-                "INSERT INTO users (username,hash)VALUES(?,?)",username,
+                "INSERT INTO users (username,hash)VALUES(?,?)", username,
                 generate_password_hash(password)
             )
-            session["user_id"]=id
+            session["user_id"] = id
+            flash("Registered!")
             return redirect("/")
         except ValueError:
-            return apology("THE USER IS EXISTENCE",400)
+            return apology("THE USER IS EXISTENCE", 400)
 
     return render_template("register.html")
 
@@ -211,4 +245,86 @@ def register():
 @login_required
 def sell():
     """Sell shares of stock"""
-    return apology("TODO")
+    id = session["user_id"]
+    stock = db.execute("SELECT * FROM user_holdings WHERE userid = ?", id)
+
+    if request.method == "POST":
+        symbol = request.form.get("symbol")
+        shares = request.form.get("shares")
+        if not symbol:
+            return apology("MISSING SYMBOL", 400)
+        if not shares:
+            return apology("MISSING SHARES", 400)
+        if "." in shares:
+            return apology("INVALID SHARES", 400)
+        try:
+            shares = int(shares)
+        except:
+            return apology("INVALID SHARES", 400)
+        if shares < 0:
+            return apology("INVALID SHARES", 400)
+        p = False
+        q = False
+        current_shares = 0
+        for i in stock:
+            if symbol == i["symbol"]:
+                p = True
+                if shares <= i["total_shares"]:
+                    q = True
+                    current_shares = i["total_shares"]
+                    break
+        if p == False:
+            return apology("SYMBOL NOT OWNED", 400)
+        if q == False:
+            return apology("TOO MANY SHARES", 400)
+
+        information = lookup(symbol)
+        price = information["price"]
+        db.execute("UPDATE users SET cash=cash+? WHERE id = ?", price*shares, id)
+        db.execute("INSERT INTO history(userid,symbol,trade_price,trade_shares)VALUES(?,?,?,?)",
+                   id, symbol, price, -shares)
+
+        if current_shares > shares:
+            db.execute("UPDATE user_holdings SET total_shares=total_shares-? WHERE userid = ? AND symbol=?",
+                       shares, id, symbol)
+        else:
+            db.execute("DELETE FROM user_holdings WHERE userid=? AND SYMBOL=?", id, symbol)
+
+        flash("SOLD!")
+
+        return redirect("/")
+
+    else:
+        return render_template("sell.html", stock=stock)
+
+
+@app.route("/changepassword", methods=["GET", "POST"])
+@login_required
+def change():
+    """change user password"""
+    if request.method == "POST":
+        if not request.form.get("oldpwd"):
+            return apology("must provide oldpassword", 403)
+        elif not request.form.get("newpwd1"):
+            return apology("must privide newpassword", 403)
+        elif not request.form.get("newpwd2"):
+            return apology("must type newpassword again", 403)
+        rows = db.execute(
+            "SELECT * FROM users WHERE id=?", session["user_id"]
+        )
+        if not check_password_hash(
+            rows[0]["hash"], request.form.get("oldpwd")
+        ):
+            return apology("invalid oldpassword", 403)
+
+        if request.form.get("newpwd1") != request.form.get("newpwd2"):
+            return apology("newpasswords are inconsistent", 403)
+
+        db.execute(
+            "UPDATE users SET hash=? WHERE id=?", generate_password_hash(
+                request.form.get("newpwd1")), session["user_id"]
+        )
+        flash("Successfully modified")
+        return redirect("/")
+    else:
+        return render_template("change-password.html")
